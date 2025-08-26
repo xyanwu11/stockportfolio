@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+portfolio_analysis.log
+
+# Data files (可選 - 如果不想上傳Excel檔案)
+# *.xlsx
+# *.csv
+
+# Temporary files
+*.tmp
+*.temp
+
+# Streamlit cache
+.streamlit/secrets.toml
