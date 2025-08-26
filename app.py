@@ -201,10 +201,14 @@ def get_stock_data(symbols, start_date, end_date):
     import concurrent.futures
     import time
     
-    # 創建進度追蹤
+    # 創建進度追蹤 - 雲端環境優化
     progress_bar = st.progress(0)
     status_text = st.empty()
     success_count = 0
+    
+    # 雲端環境檢測
+    import os
+    is_cloud = os.getenv('STREAMLIT_SHARING_MODE') or 'streamlit.app' in os.getenv('HOME', '')
     
     def fetch_single_stock(symbol):
         """單一股票數據獲取函數"""
@@ -250,15 +254,19 @@ def get_stock_data(symbols, start_date, end_date):
                 if data is not None:
                     stock_data[symbol_result] = data
                     success_count += 1
-                    status_text.text(f'✅ 成功獲取 {symbol_result} 的數據 ({success_count}/{len(symbols)})')
+                    if not is_cloud:  # 只在本地環境更新狀態
+                        status_text.text(f'✅ 成功獲取 {symbol_result} 的數據 ({success_count}/{len(symbols)})')
                 else:
-                    status_text.text(f'⚠️ 無法獲取 {symbol} 的數據')
+                    if not is_cloud:
+                        status_text.text(f'⚠️ 無法獲取 {symbol} 的數據')
                     
             except Exception as exc:
-                status_text.text(f'❌ 獲取 {symbol} 數據時出錯: {exc}')
+                if not is_cloud:
+                    status_text.text(f'❌ 獲取 {symbol} 數據時出錯: {exc}')
             
-            progress_bar.progress((i + 1) / len(symbols))
-            time.sleep(0.1)  # 小延遲避免請求過快
+            if not is_cloud:  # 只在本地環境更新進度條
+                progress_bar.progress((i + 1) / len(symbols))
+            time.sleep(0.05 if is_cloud else 0.1)  # 雲端環境更快處理
     
     progress_bar.empty()
     status_text.empty()
